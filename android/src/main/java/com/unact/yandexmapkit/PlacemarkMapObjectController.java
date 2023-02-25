@@ -26,21 +26,19 @@ import java.util.Map;
 import io.flutter.FlutterInjector;
 
 public class PlacemarkMapObjectController
-  extends MapObjectController
-  implements MapObjectTapListener, MapObjectDragListener
-{
+    extends MapObjectController
+    implements MapObjectTapListener, MapObjectDragListener {
   private final boolean internallyControlled;
   public final PlacemarkMapObject placemark;
   private boolean consumeTapEvents = false;
   private final WeakReference<YandexMapController> controller;
   public final String id;
 
-  @SuppressWarnings({"unchecked", "ConstantConditions"})
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
   public PlacemarkMapObjectController(
-    BaseMapObjectCollection parent,
-    Map<String, Object> params,
-    WeakReference<YandexMapController> controller
-  ) {
+      BaseMapObjectCollection parent,
+      Map<String, Object> params,
+      WeakReference<YandexMapController> controller) {
     PlacemarkMapObject placemark = null;
     Point point = Utils.pointFromJson((Map<String, Object>) params.get("point"));
 
@@ -49,7 +47,7 @@ public class PlacemarkMapObjectController
     }
 
     if (parent instanceof MapObjectCollection) {
-       placemark = ((MapObjectCollection) parent).addPlacemark(point);
+      placemark = ((MapObjectCollection) parent).addPlacemark(point);
     }
 
     this.placemark = placemark;
@@ -64,10 +62,9 @@ public class PlacemarkMapObjectController
   }
 
   public PlacemarkMapObjectController(
-    PlacemarkMapObject placemark,
-    Map<String, Object> params,
-    WeakReference<YandexMapController> controller
-  ) {
+      PlacemarkMapObject placemark,
+      Map<String, Object> params,
+      WeakReference<YandexMapController> controller) {
     this.placemark = placemark;
     this.id = (String) params.get("id");
     this.controller = controller;
@@ -78,7 +75,8 @@ public class PlacemarkMapObjectController
     placemark.setDragListener(this);
     update(params);
   }
-  @SuppressWarnings({"unchecked", "ConstantConditions"})
+
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
   public void update(Map<String, Object> params) {
     if (!internallyControlled) {
       placemark.setGeometry(Utils.pointFromJson((Map<String, Object>) params.get("point")));
@@ -90,7 +88,7 @@ public class PlacemarkMapObjectController
     placemark.setOpacity(((Double) params.get("opacity")).floatValue());
     placemark.setDirection(((Double) params.get("direction")).floatValue());
 
-    setIcon(((Map<String, Object>) params.get("icon")));
+    setIcon(((Map<String, Object>) params.get("icon")), (String) params.get("id"));
 
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
@@ -103,8 +101,8 @@ public class PlacemarkMapObjectController
     placemark.getParent().remove(placemark);
   }
 
-  @SuppressWarnings({"unchecked", "ConstantConditions"})
-  private void setIcon(Map<String, Object> icon) {
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
+  private void setIcon(Map<String, Object> icon, String id) {
     if (icon == null) {
       return;
     }
@@ -115,14 +113,20 @@ public class PlacemarkMapObjectController
       Map<String, Object> style = ((Map<String, Object>) icon.get("style"));
       Map<String, Object> image = ((Map<String, Object>) style.get("image"));
 
-      placemark.setIcon(getIconImage(image), getIconStyle(style));
+      if (MapObjectImageRepository.images.containsKey(id)) {
+        placemark.setIcon(MapObjectImageRepository.images.get(id), getIconStyle(style));
+      } else {
+        ImageProvider imageProvider = getIconImage(image);
+        MapObjectImageRepository.images.put(id, imageProvider);
+        placemark.setIcon(imageProvider, getIconStyle(style));
+      }
     }
 
     if (iconType.equals("composite")) {
       CompositeIcon compositeIcon = placemark.useCompositeIcon();
       List<Map<String, Object>> iconParts = ((List<Map<String, Object>>) icon.get("iconParts"));
 
-      for (Map<String, Object> iconPart: iconParts) {
+      for (Map<String, Object> iconPart : iconParts) {
         Map<String, Object> style = ((Map<String, Object>) iconPart.get("style"));
         Map<String, Object> image = ((Map<String, Object>) style.get("image"));
         String name = (String) iconPart.get("name");
@@ -132,13 +136,14 @@ public class PlacemarkMapObjectController
     }
   }
 
-  @SuppressWarnings({"ConstantConditions"})
+  @SuppressWarnings({ "ConstantConditions" })
   private ImageProvider getIconImage(Map<String, Object> image) {
     String type = (String) image.get("type");
     ImageProvider defaultImage = ImageProvider.fromBitmap(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888));
 
     if (type.equals("fromAssetImage")) {
-      String assetName = FlutterInjector.instance().flutterLoader().getLookupKeyForAsset((String) image.get("assetName"));
+      String assetName = FlutterInjector.instance().flutterLoader()
+          .getLookupKeyForAsset((String) image.get("assetName"));
 
       try (InputStream i = controller.get().context.getAssets().open(assetName)) {
         Bitmap result = BitmapFactory.decodeStream(i);
@@ -163,7 +168,7 @@ public class PlacemarkMapObjectController
     return defaultImage;
   }
 
-  @SuppressWarnings({"unchecked", "ConstantConditions"})
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
   private IconStyle getIconStyle(Map<String, Object> style) {
     IconStyle iconStyle = new IconStyle();
 
