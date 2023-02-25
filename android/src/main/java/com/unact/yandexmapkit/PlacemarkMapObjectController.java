@@ -79,8 +79,6 @@ public class PlacemarkMapObjectController
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
   public void update(Map<String, Object> params) {
-    setIcon(((Map<String, Object>) params.get("icon")), (String) params.get("id"));
-
     if (!internallyControlled) {
       placemark.setGeometry(Utils.pointFromJson((Map<String, Object>) params.get("point")));
       placemark.setVisible((Boolean) params.get("isVisible"));
@@ -90,6 +88,12 @@ public class PlacemarkMapObjectController
     placemark.setDraggable((Boolean) params.get("isDraggable"));
     placemark.setOpacity(((Double) params.get("opacity")).floatValue());
     placemark.setDirection(((Double) params.get("direction")).floatValue());
+
+    setIcon(
+        ((Map<String, Object>) params.get("icon")),
+        (String) params.get("id"),
+        (bool) params.get("is_shrink"),
+        (bool) params.get("is_selected"));
 
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
@@ -102,12 +106,16 @@ public class PlacemarkMapObjectController
     placemark.getParent().remove(placemark);
   }
 
-  @SuppressWarnings({ "unchecked", "ConstantConditions" })
-  private void setIcon(Map<String, Object> icon, String id) {
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })  
+  private void setIcon(Map<String, Object> icon, String id, bool isShrink, bool isSelected) {
+    String imageId = id + isShrink.toString() + isSelected.toString();
+
     if (icon == null) {
-      if (MapObjectImageRepository.getInstance().images.containsKey(id)) {
-        placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id),
-            getIconStyle(MapObjectImageRepository.getInstance().styles.get(id)));
+      if (MapObjectImageRepository.getInstance().images.containsKey(imageId)) {
+        ImageProvider image = MapObjectImageRepository.getInstance().images.get(imageId);
+        Map<String, Object> style = MapObjectImageRepository.getInstance().styles.get(imageId);
+
+        placemark.setIcon(image, style);
       }
 
       return;
@@ -119,14 +127,10 @@ public class PlacemarkMapObjectController
       Map<String, Object> style = ((Map<String, Object>) icon.get("style"));
       Map<String, Object> image = ((Map<String, Object>) style.get("image"));
 
-      if (MapObjectImageRepository.getInstance().images.containsKey(id)) {
-        placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id), getIconStyle(style));
-      } else {
-        ImageProvider imageProvider = getIconImage(image);
-        MapObjectImageRepository.getInstance().images.put(id, imageProvider);
-        MapObjectImageRepository.getInstance().styles.put(id, (Map<String, Object>) icon.get("style"));
-        placemark.setIcon(imageProvider, getIconStyle(style));
-      }
+      ImageProvider imageProvider = getIconImage(image);
+      MapObjectImageRepository.getInstance().images.put(imageId, imageProvider);
+      MapObjectImageRepository.getInstance().styles.put(imageId, (Map<String, Object>) icon.get("style"));
+      placemark.setIcon(imageProvider, getIconStyle(style));
     }
 
     if (iconType.equals("composite")) {

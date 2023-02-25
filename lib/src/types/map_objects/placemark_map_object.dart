@@ -5,6 +5,8 @@ class PlacemarkMapObject extends Equatable implements MapObject {
   PlacemarkMapObject({
     required this.mapId,
     required this.point,
+    this.isSelected = false,
+    this.isShrink = false,
     this.zIndex = 0.0,
     this.onTap,
     this.onDragStart,
@@ -61,6 +63,9 @@ class PlacemarkMapObject extends Equatable implements MapObject {
   /// Measured in degrees.
   final double direction;
 
+  final bool isSelected;
+  final bool isShrink;
+
   PlacemarkMapObject copyWith({
     Point? point,
     double? zIndex,
@@ -88,7 +93,9 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       isDraggable: isDraggable ?? this.isDraggable,
       icon: icon ?? this.icon,
       opacity: opacity ?? this.opacity,
-      direction: direction ?? this.direction
+      direction: direction ?? this.direction,
+      isSelected: isSelected,
+      isShrink: isShrink,
     );
   }
 
@@ -113,7 +120,9 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       isDraggable: isDraggable,
       icon: icon,
       opacity: opacity,
-      direction: direction
+      direction: direction,
+      isSelected: isSelected,
+      isShrink: isShrink,
     );
   }
 
@@ -156,46 +165,46 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       'isDraggable': isDraggable,
       'opacity': opacity,
       'direction': direction,
-      'icon': icon?.toJson()
+      'icon': icon?.toJson(),
+      'is_shrink': isShrink,
+      'is_selected': isSelected,
     };
   }
 
   @override
   Map<String, dynamic> _createJson() {
-    return toJson()..addAll({
-      'type': runtimeType.toString()
-    });
+    return toJson()..addAll({'type': runtimeType.toString()});
   }
 
   @override
   Map<String, dynamic> _updateJson(MapObject previous) {
     assert(mapId == previous.mapId);
 
-    return toJson()..addAll({
-      'type': runtimeType.toString(),
-    });
+    return toJson()
+      ..addAll({
+        'type': runtimeType.toString(),
+      });
   }
 
   @override
   Map<String, dynamic> _removeJson() {
-    return {
-      'id': mapId.value,
-      'type': runtimeType.toString()
-    };
+    return {'id': mapId.value, 'type': runtimeType.toString()};
   }
 
   @override
   List<Object?> get props => <Object?>[
-    mapId,
-    point,
-    zIndex,
-    consumeTapEvents,
-    isVisible,
-    isDraggable,
-    opacity,
-    direction,
-    icon
-  ];
+        mapId,
+        point,
+        zIndex,
+        consumeTapEvents,
+        isVisible,
+        isDraggable,
+        opacity,
+        direction,
+        icon,
+        isShrink,
+        isSelected,
+      ];
 
   @override
   bool get stringify => true;
@@ -218,18 +227,13 @@ class PlacemarkIcon extends Equatable {
 
   /// Used to describe a single icon to represent a [PlacemarkMapObject] on the map.
   factory PlacemarkIcon.single(PlacemarkIconStyle style) {
-    return PlacemarkIcon._({
-      'type': 'single',
-      'style': style.toJson()
-    });
+    return PlacemarkIcon._({'type': 'single', 'style': style.toJson()});
   }
 
   Map<String, dynamic> toJson() => _json;
 
   @override
-  List<Object> get props => <Object>[
-    _json
-  ];
+  List<Object> get props => <Object>[_json];
 
   @override
   bool get stringify => true;
@@ -267,16 +271,15 @@ class PlacemarkIconStyle extends Equatable {
   final MapRect? tappableArea;
 
   /// Creates an icon to be used to represent a [PlacemarkMapObject] on the map.
-  const PlacemarkIconStyle({
-    required this.image,
-    this.anchor = const Offset(0.5, 0.5),
-    this.rotationType = RotationType.noRotation,
-    this.zIndex = 0,
-    this.isFlat = false,
-    this.isVisible = true,
-    this.scale = 1,
-    this.tappableArea
-  });
+  const PlacemarkIconStyle(
+      {required this.image,
+      this.anchor = const Offset(0.5, 0.5),
+      this.rotationType = RotationType.noRotation,
+      this.zIndex = 0,
+      this.isFlat = false,
+      this.isVisible = true,
+      this.scale = 1,
+      this.tappableArea});
 
   Map<String, dynamic> toJson() {
     return {
@@ -296,19 +299,18 @@ class PlacemarkIconStyle extends Equatable {
 
   @override
   List<Object?> get props => <Object?>[
-    anchor,
-    rotationType,
-    zIndex,
-    isFlat,
-    isVisible,
-    scale,
-    tappableArea
-  ];
+        anchor,
+        rotationType,
+        zIndex,
+        isFlat,
+        isVisible,
+        scale,
+        tappableArea
+      ];
 
   @override
   bool get stringify => true;
 }
-
 
 /// A part of a composite icon to visually show a [PlacemarkMapObject] icon
 class PlacemarkCompositeIconItem extends Equatable {
@@ -322,30 +324,18 @@ class PlacemarkCompositeIconItem extends Equatable {
   final String name;
 
   /// Creates an icon to be used as part of a single icon to represent a [PlacemarkMapObject] on the map.
-  const PlacemarkCompositeIconItem({
-    required this.style,
-    required this.name
-  });
+  const PlacemarkCompositeIconItem({required this.style, required this.name});
 
   Map<String, dynamic> toJson() {
-    return {
-      'style': style.toJson(),
-      'name': name
-    };
+    return {'style': style.toJson(), 'name': name};
   }
 
   @override
-  List<Object> get props => <Object>[
-    style,
-    name
-  ];
+  List<Object> get props => <Object>[style, name];
 
   @override
   bool get stringify => true;
 }
 
 /// [PlacemarkIconStyle] rotation types
-enum RotationType {
-  noRotation,
-  rotate
-}
+enum RotationType { noRotation, rotate }
