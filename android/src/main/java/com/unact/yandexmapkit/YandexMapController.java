@@ -155,9 +155,7 @@ public class YandexMapController implements
         moveCamera(call, result);
         break;
       case "updateMapObjects":
-        CompletableFuture.runAsync(() -> {
-          updateMapObjects(call);
-        });
+        updateMapObjects(call);
         result.success(null);
         break;
       case "updateMapOptions":
