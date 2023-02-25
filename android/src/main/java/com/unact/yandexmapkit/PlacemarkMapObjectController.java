@@ -210,5 +210,9 @@ public class PlacemarkMapObjectController
 }
 
 class MapObjectImageRepository {
-  public static Map<String, ImageProvider> images = Map.of();
+  public static Map<String, ImageProvider> images;
+
+  static {
+    images = new HashMap<>();
+  }
 }
