@@ -56,10 +56,8 @@ public class MapObjectCollectionController extends MapObjectController implement
   public void update(Map<String, Object> params) {
     mapObjectCollection.setZIndex(((Double) params.get("zIndex")).floatValue());
     mapObjectCollection.setVisible((Boolean) params.get("isVisible"));
-    CompletableFuture.runAsync(() -> {
-      updateMapObjects((Map<String, Object>) params.get("mapObjects"));
-    });
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
+    updateMapObjects((Map<String, Object>) params.get("mapObjects"));
   }
 
   public void remove() {
