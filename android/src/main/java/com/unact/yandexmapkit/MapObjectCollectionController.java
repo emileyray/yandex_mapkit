@@ -11,6 +11,7 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class MapObjectCollectionController extends MapObjectController implements MapObjectTapListener {
   private final Map<String, MapObjectCollectionController> mapObjectCollections = new HashMap<>();
