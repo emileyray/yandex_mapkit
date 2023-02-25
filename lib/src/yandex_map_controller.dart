@@ -183,7 +183,7 @@ class YandexMapController extends ChangeNotifier {
 
     // ignore: unawaited_futures
     controller._updateMapObjects(updates.toJson());
-    await _channel.invokeMethod('updateMapObjects', updates);
+    _yandexMapState._mapObjectCollection = updatedMapObjectCollection;
   }
 
   Future<dynamic> _handleMethodCall(MethodCall call) async {
