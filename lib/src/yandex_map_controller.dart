@@ -177,12 +177,12 @@ class YandexMapController extends ChangeNotifier {
   }
 
   /// Changes current map options
-  Future<void> updateMapOptions(Map<String, dynamic> options) async {
+  Future<void> _updateMapOptions(Map<String, dynamic> options) async {
     await _channel.invokeMethod('updateMapOptions', options);
   }
 
   /// Changes map objects on the map
-  Future<void> updateMapObjects(Map<String, dynamic> updates) async {
+  Future<void> _updateMapObjects(Map<String, dynamic> updates) async {
     await _channel.invokeMethod('updateMapObjects', updates);
   }
 
