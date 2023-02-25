@@ -79,6 +79,8 @@ public class PlacemarkMapObjectController
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
   public void update(Map<String, Object> params) {
+    setIcon(((Map<String, Object>) params.get("icon")), (String) params.get("id"));
+
     if (!internallyControlled) {
       placemark.setGeometry(Utils.pointFromJson((Map<String, Object>) params.get("point")));
       placemark.setVisible((Boolean) params.get("isVisible"));
@@ -88,8 +90,6 @@ public class PlacemarkMapObjectController
     placemark.setDraggable((Boolean) params.get("isDraggable"));
     placemark.setOpacity(((Double) params.get("opacity")).floatValue());
     placemark.setDirection(((Double) params.get("direction")).floatValue());
-
-    setIcon(((Map<String, Object>) params.get("icon")), (String) params.get("id"));
 
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
