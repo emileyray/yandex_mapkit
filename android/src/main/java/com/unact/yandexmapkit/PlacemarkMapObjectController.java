@@ -105,7 +105,11 @@ public class PlacemarkMapObjectController
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
   private void setIcon(Map<String, Object> icon, String id) {
     if (icon == null) {
-      return;
+      if (MapObjectImageRepository.getInstance().images.containsKey(id)) {
+        placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id), getIconStyle(style));
+      } else {
+        return;
+      }
     }
 
     String iconType = ((String) icon.get("type"));
