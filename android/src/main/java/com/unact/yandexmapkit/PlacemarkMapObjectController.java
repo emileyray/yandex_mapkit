@@ -107,7 +107,7 @@ public class PlacemarkMapObjectController
     if (icon == null) {
       if (MapObjectImageRepository.getInstance().images.containsKey(id)) {
         placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id),
-            MapObjectImageRepository.getInstance().styles.get(id));
+            getIconStyle(MapObjectImageRepository.getInstance().styles.get(id)));
       } else {
         return;
       }
