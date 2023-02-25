@@ -92,8 +92,8 @@ public class PlacemarkMapObjectController
     setIcon(
         ((Map<String, Object>) params.get("icon")),
         (String) params.get("id"),
-        (bool) params.get("is_shrink"),
-        (bool) params.get("is_selected"));
+        (Boolean) params.get("is_shrink"),
+        (Boolean) params.get("is_selected"));
 
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
@@ -107,7 +107,7 @@ public class PlacemarkMapObjectController
   }
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })  
-  private void setIcon(Map<String, Object> icon, String id, bool isShrink, bool isSelected) {
+  private void setIcon(Map<String, Object> icon, String id, Boolean isShrink, Boolean isSelected) {
     String imageId = id + isShrink.toString() + isSelected.toString();
 
     if (icon == null) {
