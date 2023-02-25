@@ -106,7 +106,8 @@ public class PlacemarkMapObjectController
   private void setIcon(Map<String, Object> icon, String id) {
     if (icon == null) {
       if (MapObjectImageRepository.getInstance().images.containsKey(id)) {
-        placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id), getIconStyle(style));
+        placemark.setIcon(MapObjectImageRepository.getInstance().images.get(id),
+            MapObjectImageRepository.getInstance().styles.get(id));
       } else {
         return;
       }
@@ -123,6 +124,7 @@ public class PlacemarkMapObjectController
       } else {
         ImageProvider imageProvider = getIconImage(image);
         MapObjectImageRepository.getInstance().images.put(id, imageProvider);
+        MapObjectImageRepository.getInstance().styles.put(id, (Map<String, Object>) icon.get("style"));
         placemark.setIcon(imageProvider, getIconStyle(style));
       }
     }
@@ -217,9 +219,11 @@ public class PlacemarkMapObjectController
 class MapObjectImageRepository {
   private static MapObjectImageRepository single_instance = null;
   public Map<String, ImageProvider> images;
+  public Map<String, Map<String, Object>> styles;
 
   private MapObjectImageRepository() {
     this.images = new HashMap<>();
+    this.styles = new HashMap<>();
   }
 
   public static MapObjectImageRepository getInstance() {
