@@ -106,7 +106,7 @@ public class PlacemarkMapObjectController
     placemark.getParent().remove(placemark);
   }
 
-  @SuppressWarnings({ "unchecked", "ConstantConditions" })  
+  @SuppressWarnings({ "unchecked", "ConstantConditions" })
   private void setIcon(Map<String, Object> icon, String id, Boolean isShrink, Boolean isSelected) {
     String imageId = id + isShrink.toString() + isSelected.toString();
 
@@ -115,7 +115,7 @@ public class PlacemarkMapObjectController
         ImageProvider image = MapObjectImageRepository.getInstance().images.get(imageId);
         Map<String, Object> style = MapObjectImageRepository.getInstance().styles.get(imageId);
 
-        placemark.setIcon(image, style);
+        placemark.setIcon(image, getIconStyle(style));
       }
 
       return;
