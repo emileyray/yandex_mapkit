@@ -55,8 +55,9 @@ public class MapObjectCollectionController extends MapObjectController implement
   public void update(Map<String, Object> params) {
     mapObjectCollection.setZIndex(((Double) params.get("zIndex")).floatValue());
     mapObjectCollection.setVisible((Boolean) params.get("isVisible"));
-    updateMapObjects((Map<String, Object>) params.get("mapObjects"));
-
+    CompletableFuture.runAsync(() -> {
+      updateMapObjects((Map<String, Object>) params.get("mapObjects"));
+    });
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
 
@@ -92,11 +93,9 @@ public class MapObjectCollectionController extends MapObjectController implement
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
   private void updateMapObjects(Map<String, Object> params) {
-    CompletableFuture.runAsync(() -> {
-      addMapObjects((List<Map<String, Object>>) params.get("toAdd"));
-      changeMapObjects((List<Map<String, Object>>) params.get("toChange"));
-      removeMapObjects((List<Map<String, Object>>) params.get("toRemove"));
-    });
+    addMapObjects((List<Map<String, Object>>) params.get("toAdd"));
+    changeMapObjects((List<Map<String, Object>>) params.get("toChange"));
+    removeMapObjects((List<Map<String, Object>>) params.get("toRemove"));
   }
 
   @SuppressWarnings({ "ConstantConditions" })
