@@ -57,7 +57,9 @@ public class MapObjectCollectionController extends MapObjectController implement
     mapObjectCollection.setZIndex(((Double) params.get("zIndex")).floatValue());
     mapObjectCollection.setVisible((Boolean) params.get("isVisible"));
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
-    updateMapObjects((Map<String, Object>) params.get("mapObjects"));
+    CompletableFuture.runAsync(() -> {
+      updateMapObjects((Map<String, Object>) params.get("mapObjects"));
+    });
   }
 
   public void remove() {
