@@ -91,9 +91,7 @@ public class PlacemarkMapObjectController
 
     setIcon(
         ((Map<String, Object>) params.get("icon")),
-        (String) params.get("id"),
-        (Boolean) params.get("is_shrink"),
-        (Boolean) params.get("is_selected"));
+        (String) params.get("marker_image_id"));
 
     consumeTapEvents = (Boolean) params.get("consumeTapEvents");
   }
@@ -107,13 +105,11 @@ public class PlacemarkMapObjectController
   }
 
   @SuppressWarnings({ "unchecked", "ConstantConditions" })
-  private void setIcon(Map<String, Object> icon, String id, Boolean isShrink, Boolean isSelected) {
-    String imageId = id + isShrink.toString() + isSelected.toString();
-
+  private void setIcon(Map<String, Object> icon, String markerImageId) {
     if (icon == null) {
-      if (MapObjectImageRepository.getInstance().images.containsKey(imageId)) {
-        ImageProvider image = MapObjectImageRepository.getInstance().images.get(imageId);
-        Map<String, Object> style = MapObjectImageRepository.getInstance().styles.get(imageId);
+      if (MapObjectImageRepository.getInstance().images.containsKey(markerImageId)) {
+        ImageProvider image = MapObjectImageRepository.getInstance().images.get(markerImageId);
+        Map<String, Object> style = MapObjectImageRepository.getInstance().styles.get(markerImageId);
 
         placemark.setIcon(image, getIconStyle(style));
       }
@@ -128,8 +124,8 @@ public class PlacemarkMapObjectController
       Map<String, Object> image = ((Map<String, Object>) style.get("image"));
 
       ImageProvider imageProvider = getIconImage(image);
-      MapObjectImageRepository.getInstance().images.put(imageId, imageProvider);
-      MapObjectImageRepository.getInstance().styles.put(imageId, (Map<String, Object>) icon.get("style"));
+      MapObjectImageRepository.getInstance().images.put(markerImageId, imageProvider);
+      MapObjectImageRepository.getInstance().styles.put(markerImageId, (Map<String, Object>) icon.get("style"));
       placemark.setIcon(imageProvider, getIconStyle(style));
     }
 

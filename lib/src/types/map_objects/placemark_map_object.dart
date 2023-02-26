@@ -5,8 +5,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
   PlacemarkMapObject({
     required this.mapId,
     required this.point,
-    this.isSelected = false,
-    this.isShrink = false,
+    this.markerImageId,
     this.zIndex = 0.0,
     this.onTap,
     this.onDragStart,
@@ -63,8 +62,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
   /// Measured in degrees.
   final double direction;
 
-  final bool isSelected;
-  final bool isShrink;
+  final String? markerImageId;
 
   PlacemarkMapObject copyWith({
     Point? point,
@@ -79,6 +77,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
     PlacemarkIcon? icon,
     double? opacity,
     double? direction,
+    String? markerImageId,
   }) {
     return PlacemarkMapObject(
       mapId: mapId,
@@ -94,8 +93,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       icon: icon ?? this.icon,
       opacity: opacity ?? this.opacity,
       direction: direction ?? this.direction,
-      isSelected: isSelected,
-      isShrink: isShrink,
+      markerImageId: markerImageId ?? this.markerImageId,
     );
   }
 
@@ -121,8 +119,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       icon: icon,
       opacity: opacity,
       direction: direction,
-      isSelected: isSelected,
-      isShrink: isShrink,
+      markerImageId: markerImageId,
     );
   }
 
@@ -166,8 +163,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
       'opacity': opacity,
       'direction': direction,
       'icon': icon?.toJson(),
-      'is_shrink': isShrink,
-      'is_selected': isSelected,
+      'marker_image_id': markerImageId,
     };
   }
 
@@ -202,8 +198,7 @@ class PlacemarkMapObject extends Equatable implements MapObject {
         opacity,
         direction,
         icon,
-        isShrink,
-        isSelected,
+        markerImageId,
       ];
 
   @override
