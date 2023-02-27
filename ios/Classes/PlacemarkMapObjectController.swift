@@ -70,7 +70,10 @@ class PlacemarkMapObjectController:
     placemark.opacity = (params["opacity"] as! NSNumber).floatValue
     placemark.direction = (params["direction"] as! NSNumber).floatValue 
 
-    setIcon(params["icon"] as? [String: Any])
+    setIcon(
+        params["icon"] as? [String: Any],
+        params["marker_image_id"] as? String ?? ""
+    )
 
     consumeTapEvents = (params["consumeTapEvents"] as! NSNumber).boolValue
   }
@@ -101,19 +104,37 @@ class PlacemarkMapObjectController:
     return consumeTapEvents
   }
 
-  private func setIcon(_ icon: [String: Any]?) {
-    if (icon == nil) {
-      return
-    }
+    private func setIcon(_ icon: [String: Any]?, _ markerImageID: String) {
+        if (icon == nil) {
+            
+            if let image =  MapObjectImageRepository.shared.images[markerImageID], let style = MapObjectImageRepository.shared.styles[markerImageID] {
+                placemark.setIconWith(
+                    image,
+                    style: getIconStyle(style)
+                )
+            }
+            
+            return
+        }
 
     let iconType = icon!["type"] as! String
 
-    if (iconType == "single") {
-      let style = icon!["style"] as! [String: Any]
-      let image = style["image"] as! [String: Any]
-
-      placemark.setIconWith(getIconImage(image), style: getIconStyle(style))
-    }
+        if (iconType == "single") {
+            let style = icon!["style"] as! [String: Any]
+            let image = style["image"] as! [String: Any]
+            
+            let uiImage: UIImage = getIconImage(image)
+            MapObjectImageRepository.shared.images.updateValue(
+                uiImage,
+                forKey: markerImageID
+            )
+            MapObjectImageRepository.shared.styles.updateValue(
+                style,
+                forKey: markerImageID
+            )
+            
+            placemark.setIconWith(getIconImage(image), style: getIconStyle(style))
+        }
 
     if (iconType == "composite") {
       let compositeIcon = placemark.useCompositeIcon()
@@ -166,4 +187,11 @@ class PlacemarkMapObjectController:
 
     return iconStyle
   }
+}
+
+struct MapObjectImageRepository {
+    static var shared = MapObjectImageRepository()
+    
+    var images: [String: UIImage] = [:]
+    var styles: [String: [String: Any]] = [:]
 }
