@@ -214,6 +214,8 @@ class YandexMapController extends ChangeNotifier {
         return await _onUserLocationAdded(call.arguments);
       case 'onCameraPositionChanged':
         return _onCameraPositionChanged(call.arguments);
+      case 'onImageSaved':
+        return _onImageSaved(call.arguments);
       default:
         throw MissingPluginException();
     }
@@ -226,6 +228,14 @@ class YandexMapController extends ChangeNotifier {
 
     _yandexMapState
         .widget.onObjectTap!(GeoObject._fromJson(arguments['geoObject']));
+  }
+
+  void _onImageSaved(dynamic arguments) {
+    if (_yandexMapState.widget.onImageSaved == null) {
+      return;
+    }
+
+    _yandexMapState.widget.onImageSaved!(arguments['imageId']);
   }
 
   void _onMapTap(dynamic arguments) {

@@ -4,6 +4,7 @@ typedef CameraPositionCallback = void Function(CameraPosition cameraPosition, Ca
 typedef ArgumentCallback<T> = void Function(T argument);
 typedef TapCallback<T> = void Function(T mapObject, Point point);
 typedef DragStartCallback<T> = void Function(T mapObject);
+typedef ImageSavedCallback = void Function(String imageId);
 typedef DragCallback<T> = void Function(T mapObject, Point point);
 typedef DragEndCallback<T> = void Function(T mapObject);
 typedef ClusterCallback = Future<Cluster?> Function(ClusterizedPlacemarkCollection self, Cluster cluster);

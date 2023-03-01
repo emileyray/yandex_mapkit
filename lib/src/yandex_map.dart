@@ -27,7 +27,9 @@ class YandexMap extends StatefulWidget {
     this.nightModeEnabled = false,
     this.fastTapEnabled = false,
     this.mode2DEnabled = false,
-    this.logoAlignment = const MapAlignment(horizontal: HorizontalAlignment.right, vertical: VerticalAlignment.bottom),
+    this.logoAlignment = const MapAlignment(
+        horizontal: HorizontalAlignment.right,
+        vertical: VerticalAlignment.bottom),
     this.focusRect,
     this.onMapCreated,
     this.onMapTap,
@@ -37,7 +39,8 @@ class YandexMap extends StatefulWidget {
     this.onTrafficChanged,
     this.mapType = MapType.vector,
     this.poiLimit,
-    this.onObjectTap
+    this.onObjectTap,
+    this.onImageSaved,
   }) : super(key: key);
 
   static const String _viewType = 'yandex_mapkit/yandex_map';
@@ -95,6 +98,8 @@ class YandexMap extends StatefulWidget {
   /// Called every time a [YandexMap] is tapped.
   final ArgumentCallback<Point>? onMapTap;
 
+  final ImageSavedCallback? onImageSaved;
+
   /// Called every time a [YandexMap] is long tapped.
   final ArgumentCallback<Point>? onMapLongTap;
 
@@ -132,9 +137,7 @@ class _YandexMapState extends State<YandexMap> {
 
   /// Root object which contains all [MapObject] which were added to the map by user
   MapObjectCollection _mapObjectCollection = MapObjectCollection(
-    mapId: MapObjectId('root_map_object_collection'),
-    mapObjects: []
-  );
+      mapId: MapObjectId('root_map_object_collection'), mapObjects: []);
 
   /// All [MapObject] which were created natively
   ///
@@ -145,15 +148,18 @@ class _YandexMapState extends State<YandexMap> {
   /// All visible [MapObject]
   ///
   /// This contains all objects that were created by any means
-  List<MapObject> get _allMapObjects => _mapObjectCollection.mapObjects + _nonRootMapObjects;
+  List<MapObject> get _allMapObjects =>
+      _mapObjectCollection.mapObjects + _nonRootMapObjects;
 
-  final Completer<YandexMapController> _controller = Completer<YandexMapController>();
+  final Completer<YandexMapController> _controller =
+      Completer<YandexMapController>();
 
   @override
   void initState() {
     super.initState();
     _yandexMapOptions = _YandexMapOptions.fromWidget(widget);
-    _mapObjectCollection = _mapObjectCollection.copyWith(mapObjects: widget.mapObjects);
+    _mapObjectCollection =
+        _mapObjectCollection.copyWith(mapObjects: widget.mapObjects);
   }
 
   @override
@@ -187,8 +193,10 @@ class _YandexMapState extends State<YandexMap> {
   }
 
   void _updateMapObjects() async {
-    final updatedMapObjectCollection = _mapObjectCollection.copyWith(mapObjects: widget.mapObjects);
-    final updates = MapObjectUpdates.from({_mapObjectCollection}, {updatedMapObjectCollection});
+    final updatedMapObjectCollection =
+        _mapObjectCollection.copyWith(mapObjects: widget.mapObjects);
+    final updates = MapObjectUpdates.from(
+        {_mapObjectCollection}, {updatedMapObjectCollection});
 
     final controller = await _controller.future;
 
@@ -202,28 +210,28 @@ class _YandexMapState extends State<YandexMap> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       if (AndroidYandexMap.useAndroidViewSurface) {
         return PlatformViewLink(
-          viewType: YandexMap._viewType,
-          surfaceFactory: (BuildContext context, PlatformViewController controller) {
-            return AndroidViewSurface(
-              controller: controller as AndroidViewController,
-              gestureRecognizers: widget.gestureRecognizers,
-              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-            );
-          },
-          onCreatePlatformView: (PlatformViewCreationParams params) {
-            return PlatformViewsService.initExpensiveAndroidView(
-              id: params.id,
-              viewType: YandexMap._viewType,
-              layoutDirection: TextDirection.ltr,
-              creationParams: _creationParams(),
-              creationParamsCodec: StandardMessageCodec(),
-              onFocus: () => params.onFocusChanged(true),
-            )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
-            ..create();
-          }
-        );
+            viewType: YandexMap._viewType,
+            surfaceFactory:
+                (BuildContext context, PlatformViewController controller) {
+              return AndroidViewSurface(
+                controller: controller as AndroidViewController,
+                gestureRecognizers: widget.gestureRecognizers,
+                hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+              );
+            },
+            onCreatePlatformView: (PlatformViewCreationParams params) {
+              return PlatformViewsService.initExpensiveAndroidView(
+                id: params.id,
+                viewType: YandexMap._viewType,
+                layoutDirection: TextDirection.ltr,
+                creationParams: _creationParams(),
+                creationParamsCodec: StandardMessageCodec(),
+                onFocus: () => params.onFocusChanged(true),
+              )
+                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+                ..addOnPlatformViewCreatedListener(_onPlatformViewCreated)
+                ..create();
+            });
       } else {
         return AndroidView(
           viewType: YandexMap._viewType,
@@ -257,56 +265,52 @@ class _YandexMapState extends State<YandexMap> {
   Map<String, dynamic> _creationParams() {
     final mapOptions = _yandexMapOptions.toJson();
     final mapObjects = MapObjectUpdates.from(
-      {_mapObjectCollection.copyWith(mapObjects: [])},
-      {_mapObjectCollection}
-    ).toJson();
+        {_mapObjectCollection.copyWith(mapObjects: [])},
+        {_mapObjectCollection}).toJson();
 
-    return {
-      'mapOptions': mapOptions,
-      'mapObjects': mapObjects
-    };
+    return {'mapOptions': mapOptions, 'mapObjects': mapObjects};
   }
 }
 
 /// Configuration options for the YandexMap native view.
 class _YandexMapOptions {
-  _YandexMapOptions.fromWidget(YandexMap map) :
-    tiltGesturesEnabled = map.tiltGesturesEnabled,
-    zoomGesturesEnabled = map.zoomGesturesEnabled,
-    rotateGesturesEnabled = map.rotateGesturesEnabled,
-    scrollGesturesEnabled = map.scrollGesturesEnabled,
-    modelsEnabled = map.modelsEnabled,
-    nightModeEnabled = map.nightModeEnabled,
-    fastTapEnabled = map.fastTapEnabled,
-    mode2DEnabled = map.mode2DEnabled,
-    logoAlignment = map.logoAlignment,
-    focusRect = map.focusRect,
-    mapType = map.mapType,
-    poiLimit = map.poiLimit;
+  _YandexMapOptions.fromWidget(YandexMap map)
+      : tiltGesturesEnabled = map.tiltGesturesEnabled,
+        zoomGesturesEnabled = map.zoomGesturesEnabled,
+        rotateGesturesEnabled = map.rotateGesturesEnabled,
+        scrollGesturesEnabled = map.scrollGesturesEnabled,
+        modelsEnabled = map.modelsEnabled,
+        nightModeEnabled = map.nightModeEnabled,
+        fastTapEnabled = map.fastTapEnabled,
+        mode2DEnabled = map.mode2DEnabled,
+        logoAlignment = map.logoAlignment,
+        focusRect = map.focusRect,
+        mapType = map.mapType,
+        poiLimit = map.poiLimit;
 
-    final bool tiltGesturesEnabled;
+  final bool tiltGesturesEnabled;
 
-    final bool zoomGesturesEnabled;
+  final bool zoomGesturesEnabled;
 
-    final bool rotateGesturesEnabled;
+  final bool rotateGesturesEnabled;
 
-    final bool nightModeEnabled;
+  final bool nightModeEnabled;
 
-    final bool scrollGesturesEnabled;
+  final bool scrollGesturesEnabled;
 
-    final bool fastTapEnabled;
+  final bool fastTapEnabled;
 
-    final bool mode2DEnabled;
+  final bool mode2DEnabled;
 
-    final bool modelsEnabled;
+  final bool modelsEnabled;
 
-    final MapAlignment logoAlignment;
+  final MapAlignment logoAlignment;
 
-    final ScreenRect? focusRect;
+  final ScreenRect? focusRect;
 
-    final MapType mapType;
+  final MapType mapType;
 
-    final int? poiLimit;
+  final int? poiLimit;
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
@@ -328,6 +332,8 @@ class _YandexMapOptions {
   Map<String, dynamic> mapUpdates(_YandexMapOptions newOptions) {
     final prevOptionsMap = toJson();
 
-    return newOptions.toJson()..removeWhere((String key, dynamic value) => prevOptionsMap[key] == value);
+    return newOptions.toJson()
+      ..removeWhere(
+          (String key, dynamic value) => prevOptionsMap[key] == value);
   }
 }
