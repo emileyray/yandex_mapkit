@@ -698,13 +698,6 @@ public class YandexMapController implements
     methodChannel.invokeMethod("onMapTap", arguments);
   }
 
-  public void onImageSaved(@NonNull String imageId) {
-    Map<String, Object> arguments = new HashMap<>();
-    arguments.put("imageId", imageId);
-
-    methodChannel.invokeMethod("onImageSaved", arguments);
-  }
-
   public void onMapLongTap(@NonNull com.yandex.mapkit.map.Map map, @NonNull Point point) {
     Map<String, Object> arguments = new HashMap<>();
     arguments.put("point", Utils.pointToJson(point));
@@ -773,6 +766,13 @@ public class YandexMapController implements
     arguments.put("point", Utils.pointToJson(point));
 
     methodChannel.invokeMethod("onMapObjectTap", arguments);
+  }
+
+  public void imageSaved(@NonNull String imageId) {
+    Map<String, Object> arguments = new HashMap<>();
+    arguments.put("imageId", imageId);
+
+    methodChannel.invokeMethod("onImageSaved", arguments);
   }
 
   @Override

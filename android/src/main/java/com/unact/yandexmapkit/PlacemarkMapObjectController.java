@@ -126,7 +126,7 @@ public class PlacemarkMapObjectController
       ImageProvider imageProvider = getIconImage(image);
       MapObjectImageRepository.getInstance().images.put(markerImageId, imageProvider);
       MapObjectImageRepository.getInstance().styles.put(markerImageId, (Map<String, Object>) icon.get("style"));
-      controller.onImageSaved(markerImageId);
+      controller.get().onImageSaved(markerImageId);
       placemark.setIcon(imageProvider, getIconStyle(style));
     }
 
